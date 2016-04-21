@@ -42,8 +42,19 @@ while true; do
 		else
 			echo Parametros incorrectos
 		fi ;;
-		#"quiensoy" )
-		#quiensoy(${line[1]}) ;;
+		"quiensoy" )
+		if [ ${#line[@]} -eq 1 ]
+		then
+			echo "Yo soy "$(whoami)
+		elif [ ${line[1]} == "+h" ]
+		then
+			echo "Yo soy "$(whoami)" y estoy en la maquina "$(hostname)
+		elif [ ${line[1]} == "+inos" ]
+		then
+			echo "Yo soy "$(whoami)" y tengo el user ID "$(id -u)
+		else
+			echo Parametros Incorrectos
+		fi ;;
 		"mkdir" )
 		if [ -w $(pwd) ]
 		then
