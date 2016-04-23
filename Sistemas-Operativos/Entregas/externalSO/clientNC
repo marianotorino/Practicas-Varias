@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ $# -lt 1 ] ; then
+	echo Debe especificar un nickname
+	exit 1
+fi
+
+while true ;
+do
+	read msg
+	printf "$(date) %s dice:\r\n%s\r\n" $1 $msg
+done | nc 127.0.0.1 1234
