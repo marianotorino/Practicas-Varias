@@ -104,15 +104,15 @@ mkdirfunc(){
 		debugprint "creando al directorio $dir"
 		dashp="false"
 		index=1
-		args=${@:1}
-		for param in ${@:1}
+		args=${@:2}
+		for param in $args
 		do
 			if [ $param == "-p" ] ; then			
 				debugprint "encontrado el parametro -p"				
 				indexp=$index
 				debugprint "argumentos: $(echo $args | tr '\n' ' ' )"
-				newargs=$(echo ${args//-p} | tr '\n' ' ')
-				debugprint "nuevos argumentos: $nweargs"				
+				newargs=${args//'-p'}
+				debugprint "nuevos argumentos: $newargs"				
 				dashp="true"
 				break
 			fi
@@ -120,19 +120,34 @@ mkdirfunc(){
 		done
 		if [ "$dashp" == "true" ] ; then
 			aux=$dir
+			directories=()
 			while [ ! -e $aux ]
 			do
-				directories[]=$aux
+				debugprint "encolando el directorio $aux"
+				directories[${#directories[*]}]=$aux
 				aux=$(echo $aux | rev | cut -d"/" -f2- | rev)
 			done
-			for path in directories
+			debugprint "los directorios a crear son ${directories[*]}"
+			for path in $(echo ${directories[*]} | tr ' ' '\n' | tac)
 			do
-				mkdirfunc $path ${@:1} #pero sin -p
+				dirp=$(echo $path | rev | cut -d"/" -f2- | rev)
+				if [ -w $dirp ] ; then
+					mkdir $path $newargs 2> /dev/null
+					if [ $? -ne 0 ] ; then
+						echo No se pudo crear el directorio
+						break
+					else
+						echo Creado el directorio $path
+					fi
+				else
+					echo No tiene permiso en $path
+					break
+				fi
 			done
 		else
 			if [[ -w $(echo $dir | rev | cut -d"/" -f2- | rev) ]]
 			then
-				mkdir $dir ${@:2} 2> /dev/null
+				mkdir $dir $args 2> /dev/null
 				if [ $? -ne 0 ] ; then
 					echo No se pudo crear el directorio
 				fi
