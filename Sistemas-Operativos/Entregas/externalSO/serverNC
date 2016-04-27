@@ -8,4 +8,4 @@ while true ;
 do
 	read message
 	printf "$(date) %s dice:\r\n%s\r\n" $1 $message
-done | nc -k -l 127.0.0.1 1234
+done | nc -l 127.0.0.1 1234
