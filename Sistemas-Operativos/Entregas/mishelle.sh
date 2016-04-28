@@ -4,7 +4,7 @@ clear
 
 prompt="@"$(whoami)">"
 
-export RUTA="$SO/externalSO;/bin;/usr/bin;/usr/local/bin"
+export RUTA=$(dirname $0)"/externalSO;/bin;/usr/bin;/usr/local/bin"
 
 #Debug mode on/off
 dm=false
@@ -102,35 +102,38 @@ mkdirfunc(){
 			dir="$(pwd)/"$1
 		fi
 		debugprint "creando al directorio $dir"
+		
+		#Verifico el parametro -p y lo elimino de la lista de argumentos	
 		dashp="false"
-		index=1
 		args=${@:2}
 		for param in $args
 		do
 			if [ $param == "-p" ] ; then			
-				debugprint "encontrado el parametro -p"				
-				indexp=$index
+				debugprint "encontrado el parametro -p"
 				debugprint "argumentos: $(echo $args | tr '\n' ' ' )"
 				newargs=${args//'-p'}
 				debugprint "nuevos argumentos: $newargs"				
 				dashp="true"
 				break
 			fi
-			let index++
 		done
+
 		if [ "$dashp" == "true" ] ; then
+			#Guardo los posibles directorios a crear
 			aux=$dir
 			directories=()
 			while [ ! -e $aux ]
 			do
 				debugprint "encolando el directorio $aux"
 				directories[${#directories[*]}]=$aux
-				aux=$(echo $aux | rev | cut -d"/" -f2- | rev)
+				aux=$(dirname $aux)
 			done
 			debugprint "los directorios a crear son ${directories[*]}"
+
+			#Los intento crear
 			for path in $(echo ${directories[*]} | tr ' ' '\n' | tac)
 			do
-				dirp=$(echo $path | rev | cut -d"/" -f2- | rev)
+				dirp=$(dirname $path)
 				if [ -w $dirp ] ; then
 					mkdir $path $newargs 2> /dev/null
 					if [ $? -ne 0 ] ; then
@@ -140,12 +143,13 @@ mkdirfunc(){
 						echo Creado el directorio $path
 					fi
 				else
-					echo No tiene permiso en $path
+					echo No tiene permiso en $dirp
 					break
 				fi
 			done
 		else
-			if [[ -w $(echo $dir | rev | cut -d"/" -f2- | rev) ]]
+			#Si no llego el -p creo el directorio normalmente con sus argumentos
+			if [[ -w $(dirname $dir) ]]
 			then
 				mkdir $dir $args 2> /dev/null
 				if [ $? -ne 0 ] ; then
@@ -196,6 +200,8 @@ echo " | '_ \` _ \| / __| '_ \\"
 echo " | | | | | | \__ \ | | |"
 echo " |_| |_| |_|_|___/_| |_|"
 echo "                        "
+
+trap 'printf "\n"' SIGINT
 
 while true; do
 
