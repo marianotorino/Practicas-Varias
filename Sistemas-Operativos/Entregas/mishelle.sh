@@ -4,7 +4,13 @@ clear
 
 prompt="@"$(whoami)">"
 
-export RUTA=$(dirname $0)"/externalSO;/bin;/usr/bin;/usr/local/bin"
+external=$(dirname $0)
+
+if [ "$external" == "." ] ; then
+	external=$(pwd)
+fi
+
+export RUTA=$external"/externalSO;/bin;/usr/bin;/usr/local/bin"
 
 #Debug mode on/off
 dm=false
@@ -172,7 +178,7 @@ default(){
 	elif [[ ${1:0:2} == "./" && -x $1 ]]
 	then
 		debugprint "comando con ./"
-		$* &
+		$*
 	else
 		noexists=true
 		for path in $(echo $RUTA | tr ";" "\n" | tac)
@@ -183,8 +189,7 @@ default(){
 			then
 				debugprint "encontrado"
 				noexists=false
-				$path/$* &
-				wait
+				$path/$*
 				break
 			fi
 		done
