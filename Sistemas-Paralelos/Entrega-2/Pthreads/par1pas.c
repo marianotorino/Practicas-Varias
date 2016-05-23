@@ -27,26 +27,6 @@ pthread_mutex_t mutexMax;
 pthread_mutex_t mutexMin;
 pthread_mutex_t mutexAvg;
 
-void printMatrix(double* M, char* c, int ord){
-  int i,j;
-  printf("Matriz %s:\n", c);
-  if(ord==1){
-    for (i=0;i<N;i++){
-      for(j=0;j<N;j++){
-        printf("%f ",M[i+j*N]);
-      }
-      printf("\n");
-    }
-  } else {
-    for (i=0;i<N;i++){
-      for(j=0;j<N;j++){
-        printf("%f ",M[i*N+j]);
-      }
-      printf("\n");
-    }
-  }
-}
-
 //Para calcular tiempo
 double dwalltime(){
         double sec;
@@ -60,7 +40,6 @@ double dwalltime(){
 void *hilar(void *s){
     int i,k,j,c;
     int tid = *((int*)s);
-    int cant=0;
     int inicio=tid*(N/T);
     int fin=inicio+N/T;
     double minLocal, maxLocal, sumaLocal;
